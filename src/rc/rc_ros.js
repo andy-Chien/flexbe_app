@@ -4,6 +4,15 @@ RC.ROS = new (function() {
 	var connected = false;
 	var trying = false;
 	var namespace = "";
+	var gui = require('nw.gui');
+	var cmds = gui.App.argv;
+
+	for (let i = 0; i < cmds.length; i++) {
+		if (cmds[i] == "--ns") {
+			namespace = cmds[i+1];
+			break;
+		}
+	}
 
 	this.getROS = function() {
 		return undefined;
@@ -28,8 +37,8 @@ RC.ROS = new (function() {
 	this.trySetupConnection = function() {
 		T.logInfo("Setting up ROS connection ...");
 		trying = true;
-		UI.Settings.setRosProperties('');
-		ROS.init(setupConnection);
+		UI.Settings.setRosProperties(namespace);
+		ROS.init(setupConnection(namespace));
 		T.logInfo("Done ROS connection setup!");
 	}
 
@@ -38,7 +47,7 @@ RC.ROS = new (function() {
 		RC.PubSub.shutdown();
 		connected = false;
 		trying = false;
-		UI.Settings.setRosProperties('');
+		UI.Settings.setRosProperties(namespace);
 
 		RC.Controller.signalDisconnected();
 		RC.Sync.remove("ROS");

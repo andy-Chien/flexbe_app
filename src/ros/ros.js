@@ -6,6 +6,18 @@ ROS = new (function() {
 	var {spawn, exec, execSync} = require('child_process')
 	// var spawn = require('child_process').spawn;
 	var python = 'python' + (process.env.ROS_PYTHON_VERSION != undefined? process.env.ROS_PYTHON_VERSION : '');
+	var namespace = "";
+	var gui = require('nw.gui');
+	var cmds = gui.App.argv;
+
+	for (let i = 0; i < cmds.length; i++) {
+		if (cmds[i] == "--ns") {
+			namespace = cmds[i+1];
+			break;
+		}
+	}
+
+	var create_node = "node = rclpy.create_node('flexbe_app', namespace='" + namespace + "')";
 
 ////////////////////////////////
 // BEGIN Python implementation
@@ -13,8 +25,8 @@ ROS = new (function() {
 import rclpy
 import sys
 
-rclpy.init()
-node = rclpy.create_node('flexbe_app')
+rclpy.init() 
+` + create_node + `
 
 sys.stdout.flush()
 sys.stdout.write(':'+node.get_namespace()+':connected')

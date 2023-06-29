@@ -22,15 +22,18 @@ online_arg = DeclareLaunchArgument("offline_arg",
 
 no_app = DeclareLaunchArgument("no_app", default_value="false")
 
+ns = DeclareLaunchArgument("ns", default_value="")
+
 flexbe_app = Node(name="flexbe_app", package="flexbe_app", executable="run_app", output="screen",
-                  arguments=[{LaunchConfiguration("offline_arg")}])
+                  namespace=LaunchConfiguration("ns"), 
+                  arguments=[{LaunchConfiguration("offline_arg")},"--ns", {LaunchConfiguration("ns")}])
 
 behavior_mirror = Node(name="behavior_mirror", package="flexbe_mirror",
-                       executable="behavior_mirror_sm",
+                       executable="behavior_mirror_sm", namespace=LaunchConfiguration("ns"),
                        condition=LaunchConfigurationNotEquals("offline_arg", "--offline"))
 
 behavior_launcher = Node(name="behavior_launcher", package="flexbe_widget",
-                         executable="be_launcher", output="screen",
+                         executable="be_launcher", output="screen", namespace=LaunchConfiguration("ns"),
                          condition=LaunchConfigurationNotEquals("offline_arg", "--offline"))
 
 def generate_launch_description():

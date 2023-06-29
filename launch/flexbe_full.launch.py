@@ -15,14 +15,21 @@ def generate_launch_description():
         DeclareLaunchArgument(
             "no_app",
             default_value="false"),
+        DeclareLaunchArgument(
+            "ns",
+            default_value=""),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(flexbe_app_dir + "/launch/flexbe_ocs.launch.py"),
             launch_arguments={
                 "offline": "false",
-                "no_app": LaunchConfiguration("no_app")
+                "no_app": LaunchConfiguration("no_app"),
+                "ns": LaunchConfiguration("ns")
             }.items()
         ),
         IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(flexbe_onboard_dir + "/behavior_onboard.launch.py")
+            PythonLaunchDescriptionSource(flexbe_onboard_dir + "/behavior_onboard.launch.py"),
+            launch_arguments={
+                "ns": LaunchConfiguration("ns")
+            }.items()
         )
         ])

@@ -4,6 +4,23 @@ ROS.Subscriber = function(topic, msg_type, callback) {
 	var spawn = require('child_process').spawn;
 	var python = 'python' + (process.env.ROS_PYTHON_VERSION != undefined? process.env.ROS_PYTHON_VERSION : '');
 
+	var namespace = "";
+	var gui = require('nw.gui');
+	var cmds = gui.App.argv;
+
+	for (let i = 0; i < cmds.length; i++) {
+		if (cmds[i] == "--ns") {
+			namespace = cmds[i+1];
+			break;
+		}
+	}
+	var create_node = "node = rclpy.create_node('flexbe_app_sub_%s' % topic.replace('/', '_'))";
+
+	if (namespace != "") {
+		create_node = `node = rclpy.create_node(
+			'flexbe_app_sub_%s' % topic.split('/', 2)[2].replace('/', '_'),
+			namespace='` + namespace + "')";
+	}
 ////////////////////////////////
 // BEGIN Python implementation
 	var impl = `
@@ -24,7 +41,8 @@ msg_pkg = msg_def[0]
 msg_name = msg_def[1]
 
 rclpy.init()
-node = rclpy.create_node('flexbe_app_sub_%s' % topic.replace('/', '_'))
+
+` + create_node + `
 
 msg_module = importlib.import_module('%s.msg' % msg_pkg)
 msg_class = getattr(msg_module, msg_name)
